@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "mcp__Claude_Preview__preview_start",
+      "Bash(netstat -ano)",
+      "Bash(powershell \"Get-Process -Id 21364,55780 | Select-Object Id, ProcessName, Path\")",
+      "Bash(powershell \"Get-CimInstance Win32_Process -Filter 'ProcessId=21364 OR ProcessId=55780' | Select-Object ProcessId, CommandLine | Format-List\")",
+      "Bash(npx tsc *)",
+      "Bash(npm run *)",
+      "Bash(gh auth *)",
+      "Bash(gh repo *)"
+    ]
+  }
+}

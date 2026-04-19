@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "Vite dev (npm run dev)",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "port": 5174
+    },
+    {
+      "name": "Prototype (static HTTP via http-server)",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["-y", "http-server", "flag-parade/project", "-p", "8080", "-c-1"],
+      "port": 8080
+    }
+  ]
+}
