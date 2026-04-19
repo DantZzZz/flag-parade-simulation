@@ -317,6 +317,28 @@ canvas.plaza-canvas { position: absolute; inset: 0; display: block; width: 100%;
 }
 .shape-editor .hint { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: var(--ink-faint); font-size: 10px; pointer-events: none; }
 
+/* ---------- Custom shape editor extras ---------- */
+.custom-shape-editor { display: flex; flex-direction: column; gap: 5px; }
+.shape-editor .dot { cursor: grab; }
+.custom-editor-toolbar {
+  display: flex; gap: 4px; align-items: center;
+}
+.custom-editor-count { font-size: 10px; color: var(--ink-faint); margin-left: auto; font-family: var(--font-mono); }
+.custom-editor-save {
+  display: flex; gap: 4px; align-items: center;
+}
+.custom-editor-save input[type="text"] { flex: 1; width: auto; }
+.custom-editor-saved { display: flex; flex-direction: column; gap: 3px; max-height: 96px; overflow-y: auto; }
+.custom-editor-saved__row {
+  display: flex; gap: 4px; align-items: center;
+}
+.custom-editor-saved__name {
+  flex: 1; font-size: 10px; color: var(--ink-dim); font-family: var(--font-mono);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.debug-btn--danger { color: #e05050; }
+.debug-btn--danger:hover { background: rgba(224,80,80,0.15); color: #ff6060; }
+
 /* ---------- Path editor ---------- */
 .path-editor {
   background: rgba(0,0,0,0.3); border: 1px solid var(--line);

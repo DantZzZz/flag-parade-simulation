@@ -54,8 +54,9 @@ function makeMarbleTexture(): THREE.CanvasTexture {
 }
 
 export default function Ground() {
-  const ground = useParadeStore((s) => s.plaza.ground);
-  const size   = useParadeStore((s) => s.plaza.size);
+  const ground              = useParadeStore((s) => s.plaza.ground);
+  const size                = useParadeStore((s) => s.plaza.size);
+  const groundReflectivity  = useParadeStore((s) => s.plaza.groundReflectivity);
 
   const dims = size === 'small' ? 30 : size === 'large' ? 80 : 50;
 
@@ -94,7 +95,7 @@ export default function Ground() {
           color="#ffffff"
           roughness={0.6}
           metalness={0.05}
-          mirror={0.25}
+          mirror={groundReflectivity}
           blur={[400, 100]}
           resolution={512}
           mixBlur={6}
@@ -116,7 +117,7 @@ export default function Ground() {
           color="#ffffff"
           roughness={0.3}
           metalness={0.15}
-          mirror={0.45}
+          mirror={groundReflectivity}
           blur={[300, 80]}
           resolution={512}
           mixBlur={4}

@@ -6,6 +6,7 @@ import FlagMesh from './FlagMesh';
 import Lighting from './Lighting';
 import Ground from './Ground';
 import SpotlightSystem from './SpotlightSystem';
+import AccentSpotlights from './AccentSpotlights';
 import PostProcessing from './PostProcessing';
 
 const MOOD_BG: Record<string, string> = {
@@ -33,6 +34,7 @@ export default function ParadeScene() {
       <Lighting />
       <Ground />
       <SpotlightSystem />
+      <AccentSpotlights />
       <BearerInstances />
       <FlagMesh />
       <PostProcessing />

@@ -53,7 +53,7 @@ export default function BearerInstances() {
   useEffect(() => {
     const f = formations.find((x) => x.id === selectedId);
     if (!f) return;
-    const positions = generatePositions(f.shape, f.count, f.spacing, f.rotation, f.center);
+    const positions = generatePositions(f.shape, f.count, f.spacing, f.rotation, f.center, f.customPoints);
     if (bearerSystem.count === 0) {
       bearerSystem.init(positions);
     } else if (bearerSystem.count !== f.count) {

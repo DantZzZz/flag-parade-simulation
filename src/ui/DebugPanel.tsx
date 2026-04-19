@@ -3,13 +3,15 @@
  * Will be replaced by proper sidebar UI in Phase 6.
  */
 import ShapeIcon from './ShapeIcon';
+import CustomShapeEditor from './CustomShapeEditor';
 import { PRESETS } from '../formations/presets';
 import { useParadeStore } from '../store/useParadeStore';
 import type { PresetKey } from '../formations/presets';
-import type { Mood, Ground, FlagPattern } from '../store/types';
+import type { Mood, Ground, FlagPattern, AccentSpotMode } from '../store/types';
 
-const MOODS: Mood[]    = ['night', 'golden', 'day', 'spot'];
-const GROUNDS: Ground[] = ['grid', 'tile', 'marble', 'void'];
+const MOODS: Mood[]              = ['night', 'golden', 'day', 'spot'];
+const GROUNDS: Ground[]          = ['grid', 'tile', 'marble', 'void'];
+const ACCENT_MODES: AccentSpotMode[] = ['off', 'distributed', 'roaming'];
 const PATTERNS: FlagPattern[] = ['solid', 'horizontal', 'vertical', 'diagonal', 'circle', 'cross', 'border'];
 
 export default function DebugPanel() {
@@ -17,9 +19,12 @@ export default function DebugPanel() {
   const selectedId  = useParadeStore((s) => s.selectedId);
   const updateFormation = useParadeStore((s) => s.updateFormation);
   const setPlaza = useParadeStore((s) => s.setPlaza);
-  const mood    = useParadeStore((s) => s.plaza.mood);
-  const ground  = useParadeStore((s) => s.plaza.ground);
-  const wind    = useParadeStore((s) => s.plaza.wind);
+  const mood               = useParadeStore((s) => s.plaza.mood);
+  const ground             = useParadeStore((s) => s.plaza.ground);
+  const wind               = useParadeStore((s) => s.plaza.wind);
+  const groundReflectivity = useParadeStore((s) => s.plaza.groundReflectivity);
+  const accentSpotMode     = useParadeStore((s) => s.plaza.accentSpotMode);
+  const accentSpotSpeed    = useParadeStore((s) => s.plaza.accentSpotSpeed);
 
   const formation = formations.find((f) => f.id === selectedId);
   if (!formation) return null;
@@ -45,7 +50,7 @@ export default function DebugPanel() {
       {/* Bearers */}
       <label className="debug-panel__label">
         Bearers: {formation.count}
-        <input type="range" min={4} max={300} step={4}
+        <input type="range" min={10} max={500} step={10}
           value={formation.count} className="debug-panel__slider"
           onChange={(e) => updateFormation(formation.id, { count: Number(e.target.value) })} />
       </label>
@@ -65,6 +70,14 @@ export default function DebugPanel() {
           value={formation.rotation} className="debug-panel__slider"
           onChange={(e) => updateFormation(formation.id, { rotation: Number(e.target.value) })} />
       </label>
+
+      {/* Custom shape editor — shown only when shape is 'custom' */}
+      {formation.shape === 'custom' && (
+        <CustomShapeEditor
+          points={formation.customPoints ?? []}
+          onChange={(pts) => updateFormation(formation.id, { customPoints: pts })}
+        />
+      )}
 
       {/* Flag pattern */}
       <div className="debug-panel__title" style={{ marginTop: 4 }}>Flag</div>
@@ -109,6 +122,36 @@ export default function DebugPanel() {
           value={wind.strength} className="debug-panel__slider"
           onChange={(e) => setPlaza({ wind: { ...wind, strength: Number(e.target.value) } })} />
       </label>
+
+      {/* Ground reflectivity — only relevant for tile / marble */}
+      {(ground === 'tile' || ground === 'marble') && (
+        <label className="debug-panel__label">
+          Reflectivity: {groundReflectivity.toFixed(2)}
+          <input type="range" min={0} max={1} step={0.05}
+            value={groundReflectivity} className="debug-panel__slider"
+            onChange={(e) => setPlaza({ groundReflectivity: Number(e.target.value) })} />
+        </label>
+      )}
+
+      {/* Accent spotlights */}
+      <div className="debug-panel__title" style={{ marginTop: 4 }}>Accent Spots</div>
+      <div className="debug-panel__row">
+        {ACCENT_MODES.map((m) => (
+          <button key={m}
+            className={`debug-btn${accentSpotMode === m ? ' debug-btn--active' : ''}`}
+            onClick={() => setPlaza({ accentSpotMode: m })}>
+            {m}
+          </button>
+        ))}
+      </div>
+      {accentSpotMode === 'roaming' && (
+        <label className="debug-panel__label">
+          Sweep speed: {accentSpotSpeed.toFixed(1)}
+          <input type="range" min={0.1} max={2.0} step={0.1}
+            value={accentSpotSpeed} className="debug-panel__slider"
+            onChange={(e) => setPlaza({ accentSpotSpeed: Number(e.target.value) })} />
+        </label>
+      )}
     </div>
   );
 }
