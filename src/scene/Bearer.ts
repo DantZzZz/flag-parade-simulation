@@ -4,6 +4,8 @@ import type { Pt } from '../formations/presets';
 const MAX_BEARERS = 500;
 const BASE_SPEED = 2.5; // m/s
 const TURB_DECAY = 0.92; // per-frame turbulence decay multiplier
+const SEP_RADIUS = 0.6; // m — separation trigger distance
+const SEP_STRENGTH = 1.5; // m/s equivalent push force
 
 function randSpeedVar(): number {
   return 1 + (Math.random() * 0.06 - 0.03);
@@ -151,6 +153,35 @@ export class BearerSystem {
       this.velZ[i] = vz;
       this._prevVelX[i] = vx;
       this._prevVelZ[i] = vz;
+    }
+
+    // Separation pass — repel bearers that are too close.
+    // Cap per-bearer displacement at half the max seek movement so separation
+    // never completely overrides target-seeking.
+    const sepCap = BASE_SPEED * dt * 0.5;
+    const sepRadSq = SEP_RADIUS * SEP_RADIUS;
+    for (let i = 0; i < this.count; i++) {
+      let sx = 0, sz = 0;
+      for (let j = 0; j < this.count; j++) {
+        if (i === j) continue;
+        const dx = this.liveX[i] - this.liveX[j];
+        const dz = this.liveZ[i] - this.liveZ[j];
+        const d2 = dx * dx + dz * dz;
+        if (d2 < sepRadSq && d2 > 0.0001) {
+          const d = Math.sqrt(d2);
+          const force = (1 - d / SEP_RADIUS) * SEP_STRENGTH * dt;
+          sx += (dx / d) * force;
+          sz += (dz / d) * force;
+        }
+      }
+      const mag = Math.sqrt(sx * sx + sz * sz);
+      if (mag > sepCap) {
+        const inv = sepCap / mag;
+        sx *= inv;
+        sz *= inv;
+      }
+      this.liveX[i] += sx;
+      this.liveZ[i] += sz;
     }
   }
 }

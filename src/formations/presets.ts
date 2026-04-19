@@ -311,9 +311,10 @@ export function generatePositions(
   spacing: number,
   rotationDeg: number,
   center: { x: number; z: number },
+  customPoints?: Pt[],
 ): Pt[] {
   const meta = PRESET_MAP[shape as PresetKey] ?? PRESET_MAP['grid'];
-  const local = meta.fn(n, { spacing });
+  const local = meta.fn(n, { spacing, customPoints });
   const rotated = applyRotation(local, rotationDeg);
   return rotated.map((p) => ({ x: p.x + center.x, z: p.z + center.z }));
 }

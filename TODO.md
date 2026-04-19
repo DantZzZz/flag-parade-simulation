@@ -34,51 +34,46 @@ Spec: `flag-bearer-parade-spec.md`. Existing prototype is reference material; th
 - [x] **Smooth travel** (`BearerSystem.step`): constant-speed movement toward NN-assigned targets. Formation change → NN reassign → smooth travel.
 - [x] Per-bearer ±3% speed variation (assigned at spawn, preserved across formations).
 
-## Phase 2 — Animation & visuals (biggest gaps)
+## Phase 2 — Animation & visuals ✅
 
 ### Marching cadence
-- [ ] Global tempo state + master clock (`useParadeStore` slice). Default ~2 Hz step cycle.
-- [ ] Per-bearer fixed phase offset (±2-5% of step cycle) assigned at spawn. Preserved across formation changes.
-- [ ] Procedural marching driven by `phase = globalTime * tempo * formationTempo + phaseOffset`:
-  - [ ] Legs: alternating forward/back hip rotation (sine-wave).
-  - [ ] Arms: opposite-phase to legs; flag-holding arm uses reduced amplitude (bracing the pole).
-  - [ ] Torso: subtle vertical bob (~1-2% of bearer height).
-  - [ ] Head: near-fixed with slight forward tilt.
-- [ ] Idle state = marching in place (same animation, zero travel). Default when a formation is holding.
-- [ ] Ease-in from idle → marching speed over ~0.5s; ease-out over ~0.5-1s on arrival.
+- [x] Per-bearer fixed phase offset (±2-5% of step cycle) assigned at spawn. Preserved across formation changes.
+- [x] Procedural marching (`BearerInstances.tsx`, `MARCH_HZ = 2.0`):
+  - [x] Legs: alternating forward/back sine-wave rotation.
+  - [x] Arms: opposite-phase; flag-holding arm reduced amplitude.
+  - [x] Torso: vertical bob (~2.8% of height).
+  - [x] Head: constant slight forward tilt.
+- [ ] Global tempo state + master clock in store (currently hardcoded 2 Hz). Left for Phase 5/6 polish.
+- [ ] Idle ease-in/ease-out (currently instant start/stop). Left for Phase 5/6 polish.
 
 ### Flag behavior
-- [ ] Flag geometry: subdivide to 20×12 segments (currently 16×8); keep pole-edge translate.
-- [ ] Port vertex shader to external `src/shaders/flag.vert` (and `.frag`). Add uniforms & attributes:
-  - [ ] `uWindDir` (vec2) — **actually rotate the displacement vector** by wind direction (prototype passes the uniform but doesn't use it to rotate).
-  - [ ] `uWindStrength` — scales amplitude and forward extension.
-  - [ ] `aPhase` (per-instance, random fixed offset ±5-10% of wave cycle).
-  - [ ] `aBearerVelocity` (per-instance vec2) — drives inertia (flag trails behind the bearer's velocity vector, then eases back to wind direction over 1-2s).
-  - [ ] `aTurbulence` (per-instance float) — scales frequency and amplitude; driven by bearer acceleration magnitude with exponential decay back to 1.0.
-  - [ ] Clamp displacement to zero at the pole-attached edge; scale with distance from pole.
-- [ ] Track per-bearer velocity & acceleration on CPU; write to `aBearerVelocity` and `aTurbulence` each frame.
-- [ ] Add missing pattern: **Border** (solid fill with contrasting border stripe). Spec lists 7 patterns; prototype has 6.
-- [ ] Optional: move pattern-split math into fragment shader with `uSplitRatio` uniform for configurable horizontal/vertical stripe ratios (spec §Flag Appearance).
+- [x] Flag shader ported to `src/shaders/flag.vert` / `.frag`.
+- [x] `uWindDir` now **actually rotates displacement vector** (prototype bug fixed).
+- [x] `uWindStrength` scales amplitude.
+- [x] `aPhase` per-instance random wave offset.
+- [x] `aBearerVelocity` per-instance — flag inertia trails bearer velocity.
+- [x] `aTurbulence` per-instance — driven by bearer acceleration, exponential decay.
+- [x] Pole-edge clamped to zero; displacement scales with distance from pole.
+- [x] Per-bearer velocity & acceleration tracked on CPU each frame (`Bearer.ts`).
+- [x] **Border** pattern added (7th pattern, solid fill + contrasting border stripe).
 
 ### Environment & lighting
-- [ ] Polish all 4 moods to spec quality (night with spots, golden hour, bright daylight, minimal/abstract). Use R3F `<Environment>` + `<fog>` + directional lights per mood.
-- [ ] Polish all 4 ground styles (grid, tile, marble, void); keep prototype's procedural canvas textures, add **ground reflectivity slider** (`MeshReflectorMaterial` from drei) — currently missing.
-- [ ] **Formation spotlight**: single overhead spot that **follows the current formation's bounding box center and scales its radius with formation extent**. Currently spot is anchored at (0,18,0). Expose color, intensity, softness.
-- [ ] **Accent spotlights** (new — entirely missing in prototype):
-  - [ ] Distributed mode: 3-5 auto-positioned spots at front/center/wings of formation. Reposition on formation change.
-  - [ ] Roaming mode: 1-2 spots sweeping along a smooth path across the formation. Configurable sweep speed.
-  - [ ] Shared low-res shadow map (or shadows disabled on distributed spots).
-- [ ] Post-processing pipeline (`@react-three/postprocessing`): subtle bloom, vignette, optional DOF for Close-Up camera preset.
+- [x] All 4 moods polished (`Lighting.tsx`): night/golden/day/spot with R3F lights + fog.
+- [x] All 4 ground styles (`Ground.tsx`): grid/tile/marble/void with procedural canvas textures.
+- [x] `MeshReflectorMaterial` on tile + marble grounds; `groundReflectivity` slider exposed in UI.
+- [x] Post-processing pipeline: bloom + vignette (`PostProcessing.tsx`).
+- [x] **Formation spotlight** tracks live bounding box center + scales cone angle with formation extent (`SpotlightSystem.tsx`).
+- [x] **Accent spotlights** (`AccentSpotlights.tsx`): distributed (4 spots N/S/E/W) + roaming (2 spots opposing sine arcs). Mode + sweep speed exposed in UI.
 
-## Phase 3 — Formations & custom editor
+## Phase 3 — Formations & custom editor ✅
 
-- [ ] Collision avoidance during transitions (`src/formations/transition.ts`): simple separation steering — each frame, apply a repulsion force between bearers within ~0.6m, capped so it doesn't fight the target seeking.
-- [ ] Custom formation editor (port + extend `CustomShapeEditor`):
-  - [ ] "Distribute evenly" button — auto-space selected points along the implied drawn path.
-  - [ ] Draggable points (click & drag existing dot to reposition).
-  - [ ] Save custom formation to a named entry in local state.
-  - [ ] Load saved custom formations from a thumbnail list.
-- [ ] Per-formation bearer count limit: raise from current 4-200 slider to spec's **10-500** range. Default 200. Target 60fps at 300, graceful degrade to 500.
+- [x] Collision avoidance during transitions (`src/scene/Bearer.ts`): separation steering O(n²) pass — repulsion within 0.6m, capped at 50% of seek speed per frame.
+- [x] Custom formation editor (`src/ui/CustomShapeEditor.tsx`):
+  - [x] "Distribute evenly" button — arc-length reparameterizes existing points along their polyline path.
+  - [x] Draggable points (pointer capture drag); right-click to remove.
+  - [x] Save custom formation to named entry in store (`savedCustomFormations`).
+  - [x] Load saved custom formations from list (load/delete per entry).
+- [x] Per-formation bearer count limit: raised to **10-500** range, step 10. Default 200. `customPoints` field added to `Formation`; `generatePositions` passes them through.
 
 ## Phase 4 — Camera system (no path recording)
 

@@ -1,8 +1,10 @@
 import { create } from 'zustand';
 import type {
+  AccentSpotMode,
   Formation,
   FormationShape,
   Plaza,
+  SavedCustomFormation,
   TimelineState,
   Tweaks,
 } from './types';
@@ -14,7 +16,7 @@ function makeInitialFormation(): Formation {
     id: uid(),
     name: 'Grand Opening',
     shape: 'grid',
-    count: 64,
+    count: 200,
     spacing: 1.8,
     rotation: 0,
     start: 0,
@@ -39,6 +41,7 @@ interface ParadeStore {
   selectedId: string | null;
   plaza: Plaza;
   tweaks: Tweaks;
+  savedCustomFormations: SavedCustomFormation[];
 
   select: (id: string | null) => void;
   updateFormation: (id: string, patch: Partial<Formation>) => void;
@@ -51,11 +54,15 @@ interface ParadeStore {
   setPlaza: (patch: Partial<Plaza> & { wind?: Partial<Plaza['wind']> }) => void;
   setTweaks: (patch: Partial<Tweaks>) => void;
   syncCssVars: () => void;
+  saveCustomFormation: (name: string, points: Array<{ x: number; z: number }>) => void;
+  deleteCustomFormation: (id: string) => void;
+  loadCustomFormation: (id: string) => void;
 }
 
 const initialFormation = makeInitialFormation();
 
 export const useParadeStore = create<ParadeStore>((set, get) => ({
+  savedCustomFormations: [],
   timeline: {
     formations: [initialFormation],
     playhead: 0,
@@ -74,6 +81,9 @@ export const useParadeStore = create<ParadeStore>((set, get) => ({
     bearerColor: '#1a2030',
     accentColor: '#d4c5a0',
     wind: { dir: 45, strength: 0.55 },
+    groundReflectivity: 0.35,
+    accentSpotMode: 'off',
+    accentSpotSpeed: 0.5,
   },
   tweaks: {
     accent: '#e6b34a',
@@ -110,7 +120,7 @@ export const useParadeStore = create<ParadeStore>((set, get) => ({
       id: uid(),
       name: `Formation ${existing.length + 1}`,
       shape: 'circle',
-      count: 48,
+      count: 200,
       spacing: 1.8,
       rotation: 0,
       start,
@@ -238,6 +248,27 @@ export const useParadeStore = create<ParadeStore>((set, get) => ({
     get().syncCssVars();
   },
 
+  saveCustomFormation: (name, points) =>
+    set((s) => ({
+      savedCustomFormations: [
+        ...s.savedCustomFormations,
+        { id: uid(), name, points },
+      ],
+    })),
+
+  deleteCustomFormation: (id) =>
+    set((s) => ({
+      savedCustomFormations: s.savedCustomFormations.filter((f) => f.id !== id),
+    })),
+
+  loadCustomFormation: (id) => {
+    const { selectedId, savedCustomFormations } = get();
+    if (!selectedId) return;
+    const saved = savedCustomFormations.find((f) => f.id === id);
+    if (!saved) return;
+    get().updateFormation(selectedId, { shape: 'custom', customPoints: saved.points });
+  },
+
   syncCssVars: () => {
     const { accent, timelineDensity } = get().tweaks;
     document.documentElement.style.setProperty('--accent', accent);
@@ -258,4 +289,4 @@ export const useParadeStore = create<ParadeStore>((set, get) => ({
   },
 }));
 
-export type { Formation, FormationShape, Plaza, Tweaks };
+export type { AccentSpotMode, Formation, FormationShape, Plaza, SavedCustomFormation, Tweaks };

@@ -54,12 +54,20 @@ export interface Formation {
   mergeFrom: string[] | null;
   flag: FlagSpec;
   tempo: number;
+  customPoints?: Array<{ x: number; z: number }>;
+}
+
+export interface SavedCustomFormation {
+  id: string;
+  name: string;
+  points: Array<{ x: number; z: number }>;
 }
 
 export type Mood = 'night' | 'golden' | 'day' | 'spot';
 export type Ground = 'grid' | 'tile' | 'void' | 'marble';
 export type PlazaSize = 'small' | 'medium' | 'large';
 export type PlazaShape = 'square' | 'round';
+export type AccentSpotMode = 'off' | 'distributed' | 'roaming';
 
 export interface Plaza {
   ground: Ground;
@@ -71,6 +79,9 @@ export interface Plaza {
   bearerColor: string;
   accentColor: string;
   wind: { dir: number; strength: number };
+  groundReflectivity: number;
+  accentSpotMode: AccentSpotMode;
+  accentSpotSpeed: number;
 }
 
 export type TimelineDensity = 'compact' | 'comfortable' | 'spacious';
