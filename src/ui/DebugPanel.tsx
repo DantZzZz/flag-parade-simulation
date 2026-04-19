@@ -2,17 +2,20 @@
  * Temporary Phase 1-2 debug panel.
  * Will be replaced by proper sidebar UI in Phase 6.
  */
+import { useState } from 'react';
 import ShapeIcon from './ShapeIcon';
 import CustomShapeEditor from './CustomShapeEditor';
 import { PRESETS } from '../formations/presets';
+import { PRESET_KEYS, CAMERA_PRESETS } from '../scene/cameraPresets';
 import { useParadeStore } from '../store/useParadeStore';
 import type { PresetKey } from '../formations/presets';
-import type { Mood, Ground, FlagPattern, AccentSpotMode } from '../store/types';
+import type { Mood, Ground, FlagPattern, AccentSpotMode, CameraMode } from '../store/types';
 
 const MOODS: Mood[]              = ['night', 'golden', 'day', 'spot'];
 const GROUNDS: Ground[]          = ['grid', 'tile', 'marble', 'void'];
 const ACCENT_MODES: AccentSpotMode[] = ['off', 'distributed', 'roaming'];
 const PATTERNS: FlagPattern[] = ['solid', 'horizontal', 'vertical', 'diagonal', 'circle', 'cross', 'border'];
+const CAM_MODES: CameraMode[] = ['orbit', 'preset', 'fly'];
 
 export default function DebugPanel() {
   const formations  = useParadeStore((s) => s.timeline.formations);
@@ -25,6 +28,26 @@ export default function DebugPanel() {
   const groundReflectivity = useParadeStore((s) => s.plaza.groundReflectivity);
   const accentSpotMode     = useParadeStore((s) => s.plaza.accentSpotMode);
   const accentSpotSpeed    = useParadeStore((s) => s.plaza.accentSpotSpeed);
+
+  const camMode         = useParadeStore((s) => s.camera.mode);
+  const activePreset    = useParadeStore((s) => s.camera.activePreset);
+  const autoRotate      = useParadeStore((s) => s.camera.autoRotate);
+  const autoRotateSpeed = useParadeStore((s) => s.camera.autoRotateSpeed);
+  const flySpeed        = useParadeStore((s) => s.camera.flySpeed);
+  const bookmarks       = useParadeStore((s) => s.camera.bookmarks);
+  const setCameraMode         = useParadeStore((s) => s.setCameraMode);
+  const goToPreset            = useParadeStore((s) => s.goToPreset);
+  const goToBookmark          = useParadeStore((s) => s.goToBookmark);
+  const setAutoRotate         = useParadeStore((s) => s.setAutoRotate);
+  const setAutoRotateSpeed    = useParadeStore((s) => s.setAutoRotateSpeed);
+  const setFlySpeed           = useParadeStore((s) => s.setFlySpeed);
+  const requestBookmarkCapture = useParadeStore((s) => s.requestBookmarkCapture);
+  const deleteBookmark        = useParadeStore((s) => s.deleteBookmark);
+  const renameBookmark        = useParadeStore((s) => s.renameBookmark);
+
+  const [bookmarkName, setBookmarkName] = useState('');
+  const [renamingId, setRenamingId] = useState<string | null>(null);
+  const [renameVal, setRenameVal] = useState('');
 
   const formation = formations.find((f) => f.id === selectedId);
   if (!formation) return null;
@@ -152,6 +175,122 @@ export default function DebugPanel() {
             onChange={(e) => setPlaza({ accentSpotSpeed: Number(e.target.value) })} />
         </label>
       )}
+
+      {/* Camera */}
+      <div className="debug-panel__title" style={{ marginTop: 4 }}>Camera</div>
+      <div className="debug-panel__row">
+        {CAM_MODES.map((m) => (
+          <button key={m}
+            className={`debug-btn${camMode === m ? ' debug-btn--active' : ''}`}
+            onClick={() => {
+              if (m === 'fly') {
+                setCameraMode('fly');
+                document.body.requestPointerLock();
+              } else {
+                setCameraMode(m);
+              }
+            }}>
+            {m}
+          </button>
+        ))}
+      </div>
+
+      {camMode === 'orbit' && (
+        <>
+          <label className="debug-panel__label" style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+            <input type="checkbox" checked={autoRotate}
+              onChange={(e) => setAutoRotate(e.target.checked)} />
+            Auto-rotate
+          </label>
+          {autoRotate && (
+            <label className="debug-panel__label">
+              Speed: {autoRotateSpeed.toFixed(1)}
+              <input type="range" min={0.2} max={5} step={0.1}
+                value={autoRotateSpeed} className="debug-panel__slider"
+                onChange={(e) => setAutoRotateSpeed(Number(e.target.value))} />
+            </label>
+          )}
+        </>
+      )}
+
+      {camMode === 'preset' && (
+        <div className="debug-panel__shapes" style={{ marginTop: 4 }}>
+          {PRESET_KEYS.map((key) => (
+            <button key={key}
+              className={`debug-btn${activePreset === key ? ' debug-btn--active' : ''}`}
+              style={{ fontSize: 11, padding: '3px 6px' }}
+              onClick={() => goToPreset(key)}>
+              {CAMERA_PRESETS[key].label}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {camMode === 'fly' && (
+        <label className="debug-panel__label">
+          Fly speed: {flySpeed.toFixed(0)} m/s
+          <input type="range" min={1} max={30} step={1}
+            value={flySpeed} className="debug-panel__slider"
+            onChange={(e) => setFlySpeed(Number(e.target.value))} />
+        </label>
+      )}
+
+      {camMode === 'fly' && (
+        <div style={{ fontSize: 10, opacity: 0.6, marginTop: 2 }}>
+          WASD move · Q/E up/down · Shift fast · scroll speed · Esc exit
+        </div>
+      )}
+
+      {/* Bookmarks */}
+      <div className="debug-panel__title" style={{ marginTop: 4 }}>Bookmarks</div>
+      <div className="debug-panel__row" style={{ gap: 4 }}>
+        <input
+          className="debug-input"
+          placeholder="Name…"
+          value={bookmarkName}
+          onChange={(e) => setBookmarkName(e.target.value)}
+          style={{ flex: 1, fontSize: 11, padding: '3px 6px', background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 4, color: 'inherit' }}
+        />
+        <button className="debug-btn"
+          onClick={() => {
+            if (!bookmarkName.trim()) return;
+            requestBookmarkCapture(bookmarkName.trim());
+            setBookmarkName('');
+          }}>
+          + Save
+        </button>
+      </div>
+      {bookmarks.map((bm) => (
+        <div key={bm.id} className="debug-panel__row" style={{ gap: 4, marginTop: 2 }}>
+          {renamingId === bm.id ? (
+            <>
+              <input
+                className="debug-input"
+                value={renameVal}
+                autoFocus
+                onChange={(e) => setRenameVal(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') { renameBookmark(bm.id, renameVal); setRenamingId(null); }
+                  if (e.key === 'Escape') setRenamingId(null);
+                }}
+                style={{ flex: 1, fontSize: 11, padding: '3px 6px', background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 4, color: 'inherit' }}
+              />
+              <button className="debug-btn" onClick={() => { renameBookmark(bm.id, renameVal); setRenamingId(null); }}>✓</button>
+            </>
+          ) : (
+            <>
+              <button className="debug-btn" style={{ flex: 1, textAlign: 'left', fontSize: 11 }}
+                onClick={() => goToBookmark(bm.id)}>
+                {bm.name}
+              </button>
+              <button className="debug-btn" style={{ fontSize: 10 }}
+                onClick={() => { setRenamingId(bm.id); setRenameVal(bm.name); }}>✎</button>
+              <button className="debug-btn" style={{ fontSize: 10 }}
+                onClick={() => deleteBookmark(bm.id)}>✕</button>
+            </>
+          )}
+        </div>
+      ))}
     </div>
   );
 }

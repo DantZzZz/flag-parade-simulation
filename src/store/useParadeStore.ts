@@ -1,6 +1,10 @@
 import { create } from 'zustand';
 import type {
   AccentSpotMode,
+  CameraBookmark,
+  CameraMode,
+  CameraPresetKey,
+  CameraState,
   Formation,
   FormationShape,
   Plaza,
@@ -8,6 +12,7 @@ import type {
   TimelineState,
   Tweaks,
 } from './types';
+import { CAMERA_PRESETS } from '../scene/cameraPresets';
 
 const uid = () => Math.random().toString(36).slice(2, 9);
 
@@ -42,6 +47,7 @@ interface ParadeStore {
   plaza: Plaza;
   tweaks: Tweaks;
   savedCustomFormations: SavedCustomFormation[];
+  camera: CameraState;
 
   select: (id: string | null) => void;
   updateFormation: (id: string, patch: Partial<Formation>) => void;
@@ -57,12 +63,35 @@ interface ParadeStore {
   saveCustomFormation: (name: string, points: Array<{ x: number; z: number }>) => void;
   deleteCustomFormation: (id: string) => void;
   loadCustomFormation: (id: string) => void;
+  // camera
+  setCameraMode: (mode: CameraMode) => void;
+  goToPreset: (key: CameraPresetKey) => void;
+  goToBookmark: (id: string) => void;
+  setAutoRotate: (v: boolean) => void;
+  setAutoRotateSpeed: (v: number) => void;
+  setFlySpeed: (v: number) => void;
+  requestBookmarkCapture: (name: string) => void;
+  deleteBookmark: (id: string) => void;
+  renameBookmark: (id: string, name: string) => void;
+  clearTransition: () => void;
+  _commitBookmark: (name: string, pos: [number, number, number], target: [number, number, number]) => void;
 }
 
 const initialFormation = makeInitialFormation();
 
 export const useParadeStore = create<ParadeStore>((set, get) => ({
   savedCustomFormations: [],
+  camera: {
+    mode: 'orbit',
+    activePreset: null,
+    autoRotate: false,
+    autoRotateSpeed: 1.0,
+    flySpeed: 8,
+    bookmarks: [],
+    transitionTo: null,
+    dofEnabled: false,
+    pendingBookmarkName: null,
+  },
   timeline: {
     formations: [initialFormation],
     playhead: 0,
@@ -269,6 +298,71 @@ export const useParadeStore = create<ParadeStore>((set, get) => ({
     get().updateFormation(selectedId, { shape: 'custom', customPoints: saved.points });
   },
 
+  setCameraMode: (mode) =>
+    set((s) => ({ camera: { ...s.camera, mode, pendingBookmarkName: null } })),
+
+  goToPreset: (key) => {
+    const preset = CAMERA_PRESETS[key];
+    set((s) => ({
+      camera: {
+        ...s.camera,
+        mode: 'preset',
+        activePreset: key,
+        dofEnabled: key === 'close-up',
+        transitionTo: { position: preset.position, target: preset.target },
+      },
+    }));
+  },
+
+  goToBookmark: (id) => {
+    const bm = get().camera.bookmarks.find((b) => b.id === id);
+    if (!bm) return;
+    set((s) => ({
+      camera: {
+        ...s.camera,
+        mode: 'preset',
+        activePreset: null,
+        dofEnabled: false,
+        transitionTo: { position: bm.position, target: bm.target },
+      },
+    }));
+  },
+
+  setAutoRotate: (v) => set((s) => ({ camera: { ...s.camera, autoRotate: v } })),
+  setAutoRotateSpeed: (v) => set((s) => ({ camera: { ...s.camera, autoRotateSpeed: v } })),
+  setFlySpeed: (v) => set((s) => ({ camera: { ...s.camera, flySpeed: v } })),
+
+  requestBookmarkCapture: (name) =>
+    set((s) => ({ camera: { ...s.camera, pendingBookmarkName: name } })),
+
+  deleteBookmark: (id) =>
+    set((s) => ({
+      camera: { ...s.camera, bookmarks: s.camera.bookmarks.filter((b) => b.id !== id) },
+    })),
+
+  renameBookmark: (id, name) =>
+    set((s) => ({
+      camera: {
+        ...s.camera,
+        bookmarks: s.camera.bookmarks.map((b) => (b.id === id ? { ...b, name } : b)),
+      },
+    })),
+
+  clearTransition: () =>
+    set((s) => ({ camera: { ...s.camera, transitionTo: null } })),
+
+  _commitBookmark: (name, pos, target) =>
+    set((s) => ({
+      camera: {
+        ...s.camera,
+        pendingBookmarkName: null,
+        bookmarks: [
+          ...s.camera.bookmarks,
+          { id: Math.random().toString(36).slice(2, 9), name, position: pos, target },
+        ],
+      },
+    })),
+
   syncCssVars: () => {
     const { accent, timelineDensity } = get().tweaks;
     document.documentElement.style.setProperty('--accent', accent);
@@ -289,4 +383,4 @@ export const useParadeStore = create<ParadeStore>((set, get) => ({
   },
 }));
 
-export type { AccentSpotMode, Formation, FormationShape, Plaza, SavedCustomFormation, Tweaks };
+export type { AccentSpotMode, CameraBookmark, CameraMode, CameraPresetKey, Formation, FormationShape, Plaza, SavedCustomFormation, Tweaks };

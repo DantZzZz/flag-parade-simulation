@@ -1,7 +1,7 @@
 import { Canvas } from '@react-three/fiber';
-import { OrbitControls } from '@react-three/drei';
 import { useParadeStore } from '../store/useParadeStore';
 import BearerInstances from './BearerInstances';
+import CameraController from './CameraController';
 import FlagMesh from './FlagMesh';
 import Lighting from './Lighting';
 import Ground from './Ground';
@@ -38,16 +38,7 @@ export default function ParadeScene() {
       <BearerInstances />
       <FlagMesh />
       <PostProcessing />
-
-      <OrbitControls
-        makeDefault
-        target={[0, 0.8, 0]}
-        maxPolarAngle={Math.PI / 2.1}
-        minDistance={3}
-        maxDistance={120}
-        dampingFactor={0.08}
-        enableDamping
-      />
+      <CameraController />
     </Canvas>
   );
 }

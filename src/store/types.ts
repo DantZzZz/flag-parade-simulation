@@ -98,3 +98,25 @@ export interface TimelineState {
   duration: number;
   pxPerSec: number;
 }
+
+export type CameraMode = 'orbit' | 'preset' | 'fly';
+export type CameraPresetKey = 'aerial' | 'ground' | 'hero' | 'close-up' | 'wide' | 'diagonal';
+
+export interface CameraBookmark {
+  id: string;
+  name: string;
+  position: [number, number, number];
+  target: [number, number, number];
+}
+
+export interface CameraState {
+  mode: CameraMode;
+  activePreset: CameraPresetKey | null;
+  autoRotate: boolean;
+  autoRotateSpeed: number;
+  flySpeed: number;
+  bookmarks: CameraBookmark[];
+  transitionTo: { position: [number, number, number]; target: [number, number, number] } | null;
+  dofEnabled: boolean;
+  pendingBookmarkName: string | null;
+}
