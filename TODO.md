@@ -75,20 +75,20 @@ Spec: `flag-bearer-parade-spec.md`. Existing prototype is reference material; th
   - [x] Load saved custom formations from list (load/delete per entry).
 - [x] Per-formation bearer count limit: raised to **10-500** range, step 10. Default 200. `customPoints` field added to `Formation`; `generatePositions` passes them through.
 
-## Phase 4 — Camera system (no path recording)
+## Phase 4 — Camera system (no path recording) ✅
 
-- [ ] `CameraController.tsx` with 3 modes: Orbit (default), Presets, Free-Fly. State in store.
-- [ ] **6 camera presets** with smooth animated transitions (use `maath` damping or `@react-spring/three`):
-  - [ ] Aerial / Bird's Eye (1)
-  - [ ] Ground Level Tracking (2)
-  - [ ] Hero Shot (3)
-  - [ ] Close-Up (4, with DOF)
-  - [ ] Wide Establishing (5)
-  - [ ] Diagonal Fly-Over (6)
-- [ ] Free-fly mode: WASD + mouse-look, Shift to move faster, scroll adjusts speed, Esc exits.
-- [ ] "Save current position" bookmark list (named entries in store, delete/rename).
-- [ ] Auto-rotate toggle + speed slider in Orbit mode.
-- [ ] Camera-related keyboard shortcuts: 1-6 presets, O orbit, F free-fly, Esc exit free-fly.
+- [x] `CameraController.tsx` with 3 modes: Orbit (default), Presets, Free-Fly. State in store.
+- [x] **6 camera presets** with smooth animated transitions (lerp, lambda 3.5):
+  - [x] Aerial / Bird's Eye (1)
+  - [x] Ground Level Tracking (2)
+  - [x] Hero Shot (3)
+  - [x] Close-Up (4, with DOF)
+  - [x] Wide Establishing (5)
+  - [x] Diagonal Fly-Over (6)
+- [x] Free-fly mode: WASD + mouse-look (pointer lock), Shift to move faster, scroll adjusts speed, Esc exits.
+- [x] "Save current position" bookmark list (named entries in store, delete/rename).
+- [x] Auto-rotate toggle + speed slider in Orbit mode.
+- [x] Camera-related keyboard shortcuts: 1-6 presets, O orbit, F free-fly, Esc exit free-fly.
 
 ## Phase 5 — Timeline choreography (port & polish)
 
