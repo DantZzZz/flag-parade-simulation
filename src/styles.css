@@ -362,3 +362,41 @@ input[type="number"]:focus, input[type="text"]:focus { border-color: var(--accen
 }
 .hud h1 { margin: 0; font-family: var(--font-serif); font-size: 20px; }
 .hud p { margin: 4px 0 0; font-size: 12px; color: var(--ink-dim); }
+
+/* ---------- Phase 1 debug panel ---------- */
+.debug-panel {
+  position: absolute; bottom: 16px; right: 16px;
+  display: flex; flex-direction: column; gap: 8px;
+  padding: 14px 16px;
+  background: var(--glass); backdrop-filter: blur(16px);
+  border: 1px solid var(--line); border-radius: var(--radius);
+  min-width: 220px; max-width: 260px;
+  pointer-events: auto;
+}
+.debug-panel__title {
+  font-size: 10px; font-weight: 600; letter-spacing: 0.1em;
+  color: var(--ink-dim); text-transform: uppercase;
+}
+.debug-panel__row { display: flex; flex-wrap: wrap; gap: 4px; }
+.debug-btn {
+  padding: 3px 8px; border-radius: var(--radius-sm);
+  background: transparent; border: 1px solid var(--line);
+  color: var(--ink-dim); font-size: 11px; cursor: pointer;
+}
+.debug-btn--active { border-color: var(--accent); color: var(--accent); }
+.debug-panel__shapes {
+  display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px;
+}
+.shape-btn {
+  aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
+  border-radius: var(--radius-sm); border: 1px solid var(--line);
+  background: transparent; cursor: pointer; color: var(--ink-dim);
+  padding: 3px;
+}
+.shape-btn:hover { border-color: var(--line-strong); color: var(--ink); }
+.shape-btn--active { border-color: var(--accent); color: var(--accent); }
+.debug-panel__label {
+  display: flex; flex-direction: column; gap: 4px;
+  font-size: 11px; color: var(--ink-dim);
+}
+.debug-panel__slider { width: 100%; accent-color: var(--accent); }

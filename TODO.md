@@ -11,31 +11,28 @@ Spec: `flag-bearer-parade-spec.md`. Existing prototype is reference material; th
 
 ---
 
-## Phase 0 — Architecture migration
+## Phase 0 — Architecture migration ✅
 
-- [ ] Initialize Vite + React + TypeScript project (replace the `flag-parade/project/` HTML bundle with a proper `src/` tree).
-- [ ] Install deps: `three`, `@react-three/fiber`, `@react-three/drei`, `@react-three/postprocessing`, `zustand`, `leva` (or keep custom controls), `maath` (or `@react-spring/three`) for tweening.
-- [ ] Build project structure per spec (`src/main.tsx`, `src/App.tsx`, `src/store/`, `src/scene/`, `src/formations/`, `src/choreography/`, `src/ui/`, `src/shaders/`, `src/utils/`). Folder layout in spec §Project Structure.
-- [ ] Port `store.jsx` pub-sub store to Zustand (`useParadeStore.ts`). Preserve state shape: `timeline.formations[]`, `selectedId`, `plaza`, `tweaks`. Port helpers: `updateFormation`, `addFormation`, `splitFormation`, `deleteFormation`, `recomputeDuration`, `setPlayhead`, `setPlaying`, `setPlaza`, `setTweaks`.
-- [ ] Add TypeScript interfaces in `src/store/types.ts` for `Formation`, `Plaza`, `Tweaks`, `TimelineState`.
-- [ ] Move styles.css into the Vite build; keep CSS variables (`--accent`, `--timeline-height`, `--tick-spacing`) for live tweaks.
-- [ ] Wire R3F `<Canvas>` in `ParadeScene.tsx` to replace manual renderer/scene/camera setup from `plaza.js`.
-- [ ] **Update CLAUDE.md** — rewrite "Repo state" (new src/ structure, package.json exists), replace static-server dev instructions with `npm run dev`, update `.claude/launch.json` with the Vite config, drop resolved gotchas (snap assignment, wind shader).
+- [x] Initialize Vite + React + TypeScript project at project root.
+- [x] Install deps: `three`, `@react-three/fiber`, `@react-three/drei`, `@react-three/postprocessing`, `zustand`, `maath`, `vite-plugin-glsl`.
+- [x] Build project structure per spec (`src/main.tsx`, `src/App.tsx`, `src/store/`, `src/scene/`, `src/formations/`, `src/choreography/`, `src/ui/`, `src/shaders/`, `src/utils/`).
+- [x] Port `store.jsx` pub-sub store to Zustand (`useParadeStore.ts`). All helpers preserved.
+- [x] Add TypeScript interfaces in `src/store/types.ts`.
+- [x] Move styles.css into Vite build; CSS variables intact.
+- [x] Wire R3F `<Canvas>` in `ParadeScene.tsx`.
+- [x] Update CLAUDE.md + `.claude/launch.json`.
 
-## Phase 1 — Core bearers & formations (restore parity with prototype)
+## Phase 1 — Core bearers & formations ✅
 
-- [ ] Port formation generators to `src/formations/presets.ts` as typed functions returning `Array<{x: number, z: number}>`. Include all 12 existing + add missing:
-  - [ ] **Square Outline** (hollow square perimeter)
-  - [ ] **Staggered Rows** (offset grid / brick pattern)
-- [ ] Port `ShapeIcon` SVG generator to `src/ui/ShapeIcon.tsx`.
-- [ ] `BearerInstances.tsx`: R3F `<instancedMesh>` wrapper using per-frame matrix updates (replaces prototype's `bearerMesh.setMatrixAt` loop).
-- [ ] **Humanoid body (spec §Flag Bearers)**: replace single capsule with a compound bearer — capsule torso + sphere head + 2 thin cylinder arms + 2 thin cylinder legs. Options:
-  - Merge into a single `BufferGeometry` per LOD level (one instanced mesh per limb, all sharing the same instance transforms, limb positions computed in vertex shader from phase uniform).
-  - Or: 5-6 separate `InstancedMesh` objects, each driven by the same phase array, limb-specific offsets applied in JS each frame.
-- [ ] **Greedy nearest-neighbor assignment** (`src/formations/assignment.ts`): on formation change, assign existing bearer indices to new target positions by minimizing total travel distance (sort by distance, assign closest available). O(n²) pass is fine for 500 bearers. Replaces prototype's index-order assignment.
-- [ ] **Smooth interpolated travel** (`src/formations/transition.ts`): per-bearer position is lerped toward target with ease-in-out over the formation's transition window; currently prototype snaps `liveX[i] = s.x`.
-- [ ] Per-bearer ±2-3% speed variation during transitions (spec §Movement Speed).
-- [ ] **Update CLAUDE.md** — drop or archive "Key prototype files" section once prototype parity is verified; remove `check*.png` reference once those files are deleted; add any R3F/TS conventions that crystallized during the port.
+- [x] Port formation generators to `src/formations/presets.ts` — all 12 existing + new:
+  - [x] **Square Outline** (hollow square perimeter)
+  - [x] **Staggered Rows** (offset grid / brick pattern)
+- [x] Port `ShapeIcon` SVG generator to `src/ui/ShapeIcon.tsx`.
+- [x] `BearerInstances.tsx`: 7 R3F `InstancedMesh` objects (torso, head, L/R arms, L/R legs, pole). Per-frame matrix updates via `useFrame`.
+- [x] **Humanoid body**: capsule torso + sphere head + capsule arms + capsule legs + cylinder pole. 5–6 separate InstancedMesh, limb offsets applied in JS each frame.
+- [x] **Greedy nearest-neighbor assignment** (`src/formations/assignment.ts`): O(n²), replaces index-order.
+- [x] **Smooth travel** (`BearerSystem.step`): constant-speed movement toward NN-assigned targets. Formation change → NN reassign → smooth travel.
+- [x] Per-bearer ±3% speed variation (assigned at spawn, preserved across formations).
 
 ## Phase 2 — Animation & visuals (biggest gaps)
 
