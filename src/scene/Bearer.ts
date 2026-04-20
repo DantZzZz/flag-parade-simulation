@@ -118,6 +118,14 @@ export class BearerSystem {
     this.count = newIdx;
   }
 
+  setTargetsDirect(positions: Pt[]): void {
+    const n = Math.min(this.count, positions.length);
+    for (let i = 0; i < n; i++) {
+      this.targetX[i] = positions[i].x;
+      this.targetZ[i] = positions[i].z;
+    }
+  }
+
   step(dt: number): void {
     for (let i = 0; i < this.count; i++) {
       const dx = this.targetX[i] - this.liveX[i];

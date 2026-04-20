@@ -195,28 +195,35 @@ canvas.plaza-canvas { position: absolute; inset: 0; display: block; width: 100%;
 
 .timeline-body {
   position: relative;
-  height: var(--timeline-height, 120px);
-  background:
-    linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px) 0 0 / var(--tick-spacing, 80px) 100%,
-    rgba(0,0,0,0.2);
+  /* height set dynamically via inline style in Timeline.tsx */
   border-radius: 6px;
   border: 1px solid var(--line);
   overflow: hidden;
   user-select: none;
+  min-height: 80px;
 }
+
+.tl-scroll-area {
+  position: absolute; inset: 0;
+  overflow-x: auto; overflow-y: hidden;
+  background:
+    linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px) 0 0 / var(--tick-spacing, 80px) 100%,
+    rgba(0,0,0,0.2);
+}
+.tl-scroll-area::-webkit-scrollbar { height: 6px; }
+.tl-scroll-area::-webkit-scrollbar-thumb { background: var(--line-strong); border-radius: 3px; }
+
 .timeline-ruler {
-  position: absolute; top: 0; left: 0; right: 0; height: 22px;
+  position: sticky; top: 0; left: 0; height: 22px;
   border-bottom: 1px solid var(--line);
   font-family: var(--font-mono); font-size: 9px; color: var(--ink-faint);
   display: flex; align-items: center;
+  background: rgba(11,13,16,0.9);
+  z-index: 2;
 }
 .tick { position: absolute; top: 0; height: 100%; display: flex; align-items: center; padding-left: 5px; border-left: 1px solid var(--line); }
 
-.timeline-tracks {
-  position: absolute; top: 22px; left: 0; right: 0; bottom: 0;
-  overflow-x: auto;
-  overflow-y: hidden;
-}
+.timeline-tracks { position: relative; }
 
 .t-block {
   position: absolute;
@@ -271,6 +278,43 @@ canvas.plaza-canvas { position: absolute; inset: 0; display: block; width: 100%;
   width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent;
   border-top: 7px solid var(--accent);
 }
+
+/* Overlapping-formation warning */
+.t-block.overlapping { border-left-color: var(--danger); }
+.t-block.overlapping::after {
+  content: '⚠';
+  position: absolute; right: 22px; top: 50%; transform: translateY(-50%);
+  font-size: 10px; color: var(--danger); opacity: 0.8;
+  pointer-events: none;
+}
+
+/* Action badge inside t-block */
+.t-action-badge {
+  display: inline-flex; align-items: center; gap: 3px;
+  font-size: 10px; color: var(--accent);
+  padding: 2px 6px; border: 1px solid var(--accent-dim);
+  border-radius: 3px; margin-left: 6px; flex-shrink: 0;
+  white-space: nowrap;
+}
+.t-action-icon { width: 10px; height: 10px; display: inline-flex; }
+.t-action-icon svg { width: 100%; height: 100%; }
+
+/* Timeline toolbar extras */
+.tl-zoom { display: flex; gap: 2px; }
+.tl-density { display: flex; gap: 2px; }
+
+/* Transform shape picker */
+.tl-transform-picker {
+  display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+  padding: 8px 10px;
+  background: rgba(0,0,0,0.3); border: 1px solid var(--line);
+  border-radius: 6px; margin-bottom: 2px;
+}
+.tl-transform-label {
+  font-size: 10px; color: var(--ink-faint); text-transform: uppercase;
+  letter-spacing: 0.1em; white-space: nowrap;
+}
+.tl-transform-shapes { display: flex; flex-wrap: wrap; gap: 3px; flex: 1; }
 
 /* ---------- Tweaks panel ---------- */
 .tweaks {

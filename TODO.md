@@ -90,14 +90,17 @@ Spec: `flag-bearer-parade-spec.md`. Existing prototype is reference material; th
 - [x] Auto-rotate toggle + speed slider in Orbit mode.
 - [x] Camera-related keyboard shortcuts: 1-6 presets, O orbit, F free-fly, Esc exit free-fly.
 
-## Phase 5 — Timeline choreography (port & polish)
+## Phase 5 — Timeline choreography (port & polish) ✅
 
-- [ ] Port `timeline.jsx` to R3F-era component. Preserve features: lanes, drag-to-move blocks, drag-edge-to-resize, scrub on ruler, play/pause transport, split/merge connector paths, action badges.
-- [ ] Keep split/merge/transform/walk actions. Polish rendering of connector curves.
-- [ ] Walk action: replace prototype's linear `samplePath` with Catmull-Rom spline interpolation for smoother curves.
-- [ ] Transform action: ensure bearer indices are matched between source and target shape via greedy NN (currently interpolates by index which can cross paths).
-- [ ] Collision/overlap hinting: warn in UI when two formations on different lanes share bearers at the same time.
-- [ ] Timeline density control (compact/comfortable/spacious) ported from tweaks.
+- [x] Port `timeline.jsx` to R3F-era component (`src/ui/Timeline.tsx`). Lanes, drag-to-move blocks, drag-edge-to-resize, scrub on ruler, play/pause transport, split/merge connector paths, action badges.
+- [x] Keep split/merge/transform/walk actions. Bezier connector curves rendered in SVG.
+- [x] Walk action: Catmull-Rom spline interpolation (`catmullRomPoint` in `src/utils/timeline.ts`); bearer center sampled per-frame in `BearerInstances.tsx` via `setTargetsDirect` (no NN, same shape translated).
+- [x] Transform action: greedy NN assignment via existing `bearerSystem.setTargets()` — NN fires on formation identity change.
+- [x] Collision/overlap hinting: overlapping (non-split/merge) formations highlighted with danger border + ⚠ badge.
+- [x] Timeline density control (compact/comfortable/spacious) — buttons in toolbar call `setTweaks`.
+- [x] Inline transform shape picker replaces `prompt()`.
+- [x] Zoom +/- buttons (`setPxPerSec` store action).
+- [x] Playhead-driven bearer animation: `BearerInstances.tsx` advances playhead in `useFrame`, finds active formation at `t`, handles walk with Catmull-Rom center.
 
 ## Phase 6 — UI polish & keyboard
 
