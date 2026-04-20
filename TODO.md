@@ -102,14 +102,16 @@ Spec: `flag-bearer-parade-spec.md`. Existing prototype is reference material; th
 - [x] Zoom +/- buttons (`setPxPerSec` store action).
 - [x] Playhead-driven bearer animation: `BearerInstances.tsx` advances playhead in `useFrame`, finds active formation at `t`, handles walk with Catmull-Rom center.
 
-## Phase 6 — UI polish & keyboard
+## Phase 6 — UI polish & keyboard ✅
 
-- [ ] Port all sidebar sections to R3F-era React components, 1:1 feature parity, preserve glassmorphism styling.
-- [ ] **Hide-all-panels mode** (`H` key) — 3D canvas fullscreen, show tiny indicator.
-- [ ] Keyboard shortcuts per spec (§Keyboard Shortcuts): Space, ←/→, 1-6, O, F, H, +/-, Esc. (Skip R and M — recording and mood cycle are out of scope or handled via UI.)
-- [ ] Loading screen / intro animation.
-- [ ] Responsive: panels collapse/stack below 1024px viewport; desktop is primary.
-- [ ] Tweaks edit-mode integration: preserve `__activate_edit_mode`/`__deactivate_edit_mode` postMessage protocol from `tweaks.jsx`.
+- [x] Port all sidebar sections to R3F-era React components, 1:1 feature parity, preserve glassmorphism styling.
+  - [x] `SidebarLeft.tsx`: Ground, Shape & Size, Mood, Accent Spots, Wind dial, Bearers, Camera + Bookmarks.
+  - [x] `SidebarRight.tsx`: Formation name/metadata, Shape grid, Count/Spacing/Rotation/Tempo, Flag pattern/colors, Position, Action, PathEditor (walk), Transform target.
+- [x] **Hide-all-panels mode** (`H` key) — 3D canvas fullscreen, show tiny indicator (`panels-hidden-indicator`).
+- [x] Keyboard shortcuts per spec (§Keyboard Shortcuts): Space, ←/→, 1-6, O, F, H, +/-, Esc. (Skip R and M.)
+- [x] Loading screen / intro animation (`LoadingScreen.tsx` — fades out after 1.2s).
+- [x] Responsive: panels collapse/stack below 1024px viewport; desktop is primary.
+- [x] Tweaks edit-mode integration: `Tweaks.tsx` preserves `__activate_edit_mode`/`__deactivate_edit_mode` postMessage protocol.
 
 ## Phase 7 — Performance
 
