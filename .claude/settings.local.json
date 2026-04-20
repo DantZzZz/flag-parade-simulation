@@ -9,7 +9,9 @@
       "Bash(npx tsc *)",
       "Bash(npm run *)",
       "Bash(gh auth *)",
-      "Bash(gh repo *)"
+      "Bash(gh repo *)",
+      "Read(//c/Users/dantz/Documents/Programing Projects/Flag Parade Simulation v4/src/**)",
+      "Bash(curl -s \"http://localhost:5176/src/App.tsx\")"
     ]
   }
 }

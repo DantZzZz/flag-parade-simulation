@@ -466,3 +466,66 @@ input[type="number"]:focus, input[type="text"]:focus { border-color: var(--accen
   font-size: 11px; color: var(--ink-dim);
 }
 .debug-panel__slider { width: 100%; accent-color: var(--accent); }
+
+/* ---------- Hide-all-panels indicator ---------- */
+.panels-hidden-indicator {
+  position: fixed; bottom: 24px; right: 24px;
+  padding: 8px 14px; z-index: 50;
+  background: var(--glass-2); backdrop-filter: blur(16px);
+  border: 1px solid var(--line-strong); border-radius: var(--radius);
+  font-size: 11px; color: var(--ink-dim); cursor: pointer;
+  display: flex; align-items: center; gap: 6px;
+  transition: color 0.12s, border-color 0.12s;
+  pointer-events: auto;
+}
+.panels-hidden-indicator:hover { color: var(--ink); border-color: var(--accent); }
+
+/* ---------- Responsive: collapse sidebars below 1024px ---------- */
+@media (max-width: 1023px) {
+  .sidebar {
+    position: relative;
+    top: auto; bottom: auto; left: auto; right: auto;
+    width: 100%;
+    max-height: 220px;
+    border-radius: 0;
+    border-left: none; border-right: none;
+  }
+
+  .sidebar.left {
+    order: 2;
+    border-top: 1px solid var(--line);
+  }
+  .sidebar.right {
+    order: 3;
+    border-top: 1px solid var(--line);
+  }
+
+  .topbar {
+    position: relative;
+    top: auto; left: auto; right: auto;
+    order: 1;
+    border-bottom: 1px solid var(--line);
+    border-radius: 0;
+  }
+
+  .timeline-wrap {
+    position: relative;
+    left: auto; right: auto; bottom: auto;
+    border-radius: 0;
+    order: 4;
+  }
+
+  .app-root {
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+  }
+
+  .app-root canvas {
+    position: relative !important;
+    width: 100% !important;
+    height: 40vh !important;
+    order: 0;
+    flex-shrink: 0;
+  }
+}
