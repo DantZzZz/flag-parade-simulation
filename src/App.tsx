@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import ParadeScene from './scene/ParadeScene';
-import DebugPanel from './ui/DebugPanel';
+import Timeline from './ui/Timeline';
 import { useParadeStore } from './store/useParadeStore';
 
 export default function App() {
@@ -13,11 +13,7 @@ export default function App() {
   return (
     <div className="app-root">
       <ParadeScene />
-      <div className="hud">
-        <h1>Flag Parade</h1>
-        <p>Phase 1 — formations + humanoid bearers</p>
-      </div>
-      <DebugPanel />
+      <Timeline />
     </div>
   );
 }

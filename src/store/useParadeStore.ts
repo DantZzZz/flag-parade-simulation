@@ -51,6 +51,7 @@ interface ParadeStore {
   recomputeDuration: () => void;
   setPlayhead: (t: number) => void;
   setPlaying: (p: boolean) => void;
+  setPxPerSec: (n: number) => void;
   setPlaza: (patch: Partial<Plaza> & { wind?: Partial<Plaza['wind']> }) => void;
   setTweaks: (patch: Partial<Tweaks>) => void;
   syncCssVars: () => void;
@@ -233,6 +234,9 @@ export const useParadeStore = create<ParadeStore>((set, get) => ({
 
   setPlaying: (p) =>
     set((s) => ({ timeline: { ...s.timeline, playing: p } })),
+
+  setPxPerSec: (n) =>
+    set((s) => ({ timeline: { ...s.timeline, pxPerSec: Math.max(8, Math.min(200, n)) } })),
 
   setPlaza: (patch) =>
     set((s) => ({
